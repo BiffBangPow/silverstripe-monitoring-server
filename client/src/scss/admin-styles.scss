@@ -1,0 +1,20 @@
+.bbp-monitoring_alert-box {
+  max-width: 800px;
+  background: rgb(248,215,218);
+  border: solid 1px rgb(241,174,181);
+  color: rgb(88,21,28);
+  padding: 1rem;
+  margin-top: 3rem;
+
+  pre {
+    background: rgb(226,227,229);
+    padding: 1rem;
+    border: solid 1px rgb(196,200,203);
+    color: rgb(43,47,50);
+  }
+}
+
+p.bbp-monitoring_text-bold {
+  font-weight: 700;
+}
+

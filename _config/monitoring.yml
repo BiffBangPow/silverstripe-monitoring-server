@@ -1,0 +1,7 @@
+---
+Name: bbp-monitor-server
+---
+
+SilverStripe\Admin\LeftAndMain:
+  extra_requirements_css:
+    - biffbangpow/silverstripe-monitoring-server:client/dist/css/admin-styles.css

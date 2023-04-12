@@ -1,0 +1,32 @@
+{
+  "name": "silverstripe-monitoring-server",
+  "version": "1.0.0",
+  "description": "Monitoring server for the BBP Silverstripe monitoring system",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BiffBangPow/silverstripe-monitoring-server.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/BiffBangPow/silverstripe-monitoring-server/issues"
+  },
+  "homepage": "https://github.com/BiffBangPow/silverstripe-monitoring-server",
+  "devDependencies": {
+    "@babel/core": "^7.19.3",
+    "@babel/preset-env": "^7.19.3",
+    "autoprefixer": "^10.4.12",
+    "babel-preset-minify": "^0.5.2",
+    "bootstrap": "^5.2.2",
+    "gulp": "^4.0.2",
+    "gulp-autoprefixer": "^8.0.0",
+    "gulp-babel": "^8.0.0",
+    "gulp-clean-css": "^4.3.0",
+    "gulp-mode": "^1.1.0",
+    "gulp-sass": "^5.1.0",
+    "gulp-sourcemaps": "^3.0.0",
+    "gulp-uglify": "^3.0.2",
+    "postcss": "^8.4.17",
+    "sass": "^1.55.0"
+  }
+}
