@@ -21,7 +21,10 @@
         "silverstripe/vendor-plugin": "^1.0",
         "silverstripe/cms": "^4.0",
         "ext-sodium": "*",
-        "silverstripe/queuedjobs": "^4"
+        "silverstripe/queuedjobs": "^4",
+        "guzzlehttp/guzzle": "^7",
+        "guzzlehttp/promises": "^1",
+        "ramsey/uuid": "^4"
     },
     "license": "BSD-3-Clause",
     "autoload": {

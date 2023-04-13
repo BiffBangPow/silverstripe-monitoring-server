@@ -3,11 +3,13 @@
 namespace BiffBangPow\SSMonitor\Server\Model;
 
 use BiffBangPow\SSMonitor\Server\Helper\EncryptionHelper;
+use Ramsey\Uuid\Uuid;
 use SilverStripe\Control\Controller;
 use SilverStripe\Core\Environment;
 use SilverStripe\Forms\HeaderField;
 use SilverStripe\Forms\LiteralField;
 use SilverStripe\ORM\DataObject;
+use SilverStripe\ORM\FieldType\DBField;
 use SilverStripe\View\HTML;
 
 /**
@@ -15,29 +17,66 @@ use SilverStripe\View\HTML;
  *
  * @property string $Title
  * @property string $BaseURL
+ * @property string $UUID
  * @property string $EncSecret
  * @property string $EncSalt
  * @property string $APIKey
  * @property string $LastFetch
  * @property string $ClientData
+ * @property bool $FetchError
+ * @property bool $Active
  */
 class Client extends DataObject
 {
     private static $table_name = 'BBP_Monitoring_Client';
+    private static $fetch_delay_warning = 600;
     private static $db = [
         'Title' => 'Varchar',
         'BaseURL' => 'Varchar',
+        'UUID' => 'Varchar',
         'EncSecret' => 'Text',
         'EncSalt' => 'Text',
         'APIKey' => 'Text',
         'LastFetch' => 'Datetime',
-        'ClientData' => 'Text'
+        'ClientData' => 'Text',
+        'FetchError' => 'Boolean',
+        'Active' => 'Boolean'
     ];
 
     private static $summary_fields = [
         'Title' => 'Site',
-        'BaseURL' => 'Base URL'
+        'BaseURL' => 'Base URL',
+        'Active.Nice' => 'Active',
+        'LastFetch.Nice' => 'Last Comms',
+        'StatusHTML' => 'Status'
     ];
+
+    private static $indexes = [
+        'UUID' => true
+    ];
+
+    public function getStatusHTML()
+    {
+        $statusClass = ($this->FetchError) ? 'status-error' : 'status-ok';
+        $lastFetch = ($this->LastFetch) ? $this->LastFetch : 0;
+        $threshold = strtotime($lastFetch) + $this->config()->get('fetch_delay_warning');
+        if ($threshold <= time() && !$this->FetchError) {
+            $statusClass = 'status-warn';
+        }
+
+        return DBField::create_field('HTMLFragment', HTML::createTag('div', [
+            'class' => 'bbp-monitoring_status-dot ' . $statusClass
+        ], ' '));
+    }
+
+    /**
+     * @param $uuid
+     * @return DataObject|null
+     */
+    public static function getByUUID($uuid)
+    {
+        return self::get_one(self::class, ['UUID' => $uuid]);
+    }
 
     public function getCMSFields()
     {
@@ -47,7 +86,9 @@ class Client extends DataObject
             'EncSalt',
             'APIKey',
             'LastFetch',
-            'ClientData'
+            'ClientData',
+            'FetchError',
+            'UUID'
         ]);
 
         $session = Controller::curr()->getRequest()->getSession();
@@ -62,6 +103,7 @@ class Client extends DataObject
 MONITORING_ENC_SECRET=%s
 MONITORING_ENC_SALT=%s
 MONITORING_API_KEY=%s
+MONITORING_UUID=%s
 EOT;
 
             $storageSecret = Environment::getEnv('MONITORING_STORAGE_SECRET');
@@ -72,7 +114,7 @@ EOT;
             $encSalt = $encHelper->decrypt($this->EncSalt);
             $apikey = $encHelper->decrypt($this->APIKey);
 
-            $creds = sprintf($envTemplate, $encSecret, $encSalt, $apikey);
+            $creds = sprintf($envTemplate, $encSecret, $encSalt, $apikey, $this->UUID);
 
             $credsContent = HTML::createTag('h2', [], _t(__CLASS__ . '.client-credentials', 'Client Credentials')) .
                 HTML::createTag('p', [
@@ -110,6 +152,8 @@ EOT;
             $this->EncSecret = $encHelper->encrypt($security['secret']);
             $this->EncSalt = $encHelper->encrypt($security['salt']);
             $this->APIKey = $encHelper->encrypt($security['apikey']);
+            $uuid = Uuid::uuid4();
+            $this->UUID = $uuid->toString();
 
             $session = Controller::curr()->getRequest()->getSession();
             $session->set('initial', 'yes');
