@@ -2,6 +2,7 @@
 
 namespace BiffBangPow\SSMonitor\Server\Model;
 
+use BiffBangPow\SSMonitor\Server\Helper\ClientHelper;
 use BiffBangPow\SSMonitor\Server\Helper\EncryptionHelper;
 use Ramsey\Uuid\Uuid;
 use SilverStripe\Control\Controller;
@@ -25,6 +26,7 @@ use SilverStripe\View\HTML;
  * @property string $ClientData
  * @property bool $FetchError
  * @property bool $Active
+ * @property string $ErrorMessage
  */
 class Client extends DataObject
 {
@@ -40,12 +42,14 @@ class Client extends DataObject
         'LastFetch' => 'Datetime',
         'ClientData' => 'Text',
         'FetchError' => 'Boolean',
-        'Active' => 'Boolean'
+        'Active' => 'Boolean',
+        'ErrorMessage' => 'Text'
     ];
 
     private static $summary_fields = [
         'Title' => 'Site',
         'BaseURL' => 'Base URL',
+        'UUID' => 'Client ID',
         'Active.Nice' => 'Active',
         'LastFetch.Nice' => 'Last Comms',
         'StatusHTML' => 'Status'
@@ -71,7 +75,7 @@ class Client extends DataObject
 
     /**
      * @param $uuid
-     * @return DataObject|null
+     * @return Client|null
      */
     public static function getByUUID($uuid)
     {
@@ -88,7 +92,8 @@ class Client extends DataObject
             'LastFetch',
             'ClientData',
             'FetchError',
-            'UUID'
+            'UUID',
+            'ErrorMessage'
         ]);
 
         $session = Controller::curr()->getRequest()->getSession();
@@ -130,9 +135,43 @@ EOT;
             ]);
 
             $session->clear('initial');
+        } else {
+            $clientData = $this->showClientData();
+            if ($clientData) {
+                $fields->addFieldsToTab('Root.Main', LiteralField::create('clientdata', $clientData));
+            }
         }
 
         return $fields;
+    }
+
+    private function showClientData()
+    {
+        if (!$this->ClientData) {
+            return false;
+        }
+        $helper = new ClientHelper($this);
+        $encHelper = new EncryptionHelper($helper->getEncryptionSecret(), $helper->getEncryptionSalt());
+        $clientData = $encHelper->decrypt($this->ClientData);
+        if ($clientData) {
+            $clientDataArray = unserialize($clientData);
+            $res = HTML::createTag(
+                'div',
+                [],
+                HTML::createTag(
+                    'p',
+                    [],
+                    'Raw data - Last fetch ' . $this->LastFetch
+                ) .
+                HTML::createTag(
+                    'pre',
+                    [],
+                    print_r($clientDataArray, true)
+                )
+            );
+            return $res;
+        }
+        return false;
     }
 
     /**
