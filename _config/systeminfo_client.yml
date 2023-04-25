@@ -1,0 +1,9 @@
+---
+Name: bbp-monitoring-systeminfo
+---
+
+BiffBangPow\SSMonitor\Server\Client\SystemInfo:
+  data_config:
+    warnings:
+      min_php_version: 8.1
+      min_memory_limit: 1024M

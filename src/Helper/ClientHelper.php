@@ -23,6 +23,10 @@ class ClientHelper
         $this->encHelper = new EncryptionHelper($storageSecret, $storageSalt);
     }
 
+    /**
+     * Builds the full monitoring URL for the client
+     * @return string
+     */
     public function getMonitorURL()
     {
         return Controller::join_links([
@@ -31,16 +35,28 @@ class ClientHelper
         ]);
     }
 
+    /**
+     * Get the API key for the client
+     * @return false|string
+     */
     public function getAPIKey()
     {
         return $this->encHelper->decrypt($this->client->APIKey);
     }
 
+    /**
+     * Get the encryption secret for the client
+     * @return false|string
+     */
     public function getEncryptionSecret()
     {
         return $this->encHelper->decrypt($this->client->EncSecret);
     }
 
+    /**
+     * Get the encryption salt for the client
+     * @return false|string
+     */
     public function getEncryptionSalt()
     {
         return $this->encHelper->decrypt($this->client->EncSalt);

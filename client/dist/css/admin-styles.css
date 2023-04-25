@@ -1,3 +1,4 @@
+@charset "UTF-8";
 .bbp-monitoring_alert-box {
   max-width: 800px;
   background: rgb(248, 215, 218);
@@ -23,6 +24,7 @@
   background: transparent;
   border-radius: 50%;
   border: solid 1px #ddd;
+  display: inline-block;
 }
 .bbp-monitoring_status-dot.status-error {
   background-color: rgb(220, 53, 69);
@@ -32,5 +34,13 @@
 }
 .bbp-monitoring_status-dot.status-warn {
   background-color: rgb(255, 193, 7);
+}
+
+.bbp-monitoring_status-warning.⚠ {
+  display: inline-block;
+  font-size: 25px;
+  font-weight: 700;
+  color: rgb(255, 193, 7);
+  padding-left: 0.5rem;
 }
 /*# sourceMappingURL=../../dist/css/maps/admin-styles.css.map */
