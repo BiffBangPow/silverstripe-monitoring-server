@@ -7,7 +7,7 @@ class ReportingHelper
 
     /**
      * Compares Semver versions
-     * Returns true is the version is lower than the threshold, false if the version is equal or greater
+     * Returns true is the version if lower than the threshold, false if the version is equal or greater
      * @param $version
      * @param $threshold
      * @return bool

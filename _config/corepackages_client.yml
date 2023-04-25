@@ -1,0 +1,11 @@
+---
+Name: bbp-monitoring-corepackages
+---
+
+BiffBangPow\SSMonitor\Server\Client\CorePackages:
+  data_config:
+    warnings:
+      dev_packages: true
+      min_versions:
+        silverstripe/cms: 4.12
+        silverstripe/framework: 4.12.3

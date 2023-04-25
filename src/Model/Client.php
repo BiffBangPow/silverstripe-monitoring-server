@@ -278,7 +278,7 @@ EOT;
                 $monitorClass = $ref->newInstance();
                 $monitorName = $monitorClass->getClientName();
 
-                Injector::inst()->get(LoggerInterface::class)->info("Checking " . $monitorName);
+                //Injector::inst()->get(LoggerInterface::class)->info("Checking " . $monitorName);
 
                 if (isset($clientDataArray[$monitorName])) {
                     if ($monitorClass->getWarnings($clientDataArray[$monitorName]) !== false) {

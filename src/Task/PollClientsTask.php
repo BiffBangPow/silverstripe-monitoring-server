@@ -6,12 +6,26 @@ use BiffBangPow\SSMonitor\Server\Helper\ClientHelper;
 use BiffBangPow\SSMonitor\Server\Helper\CommsHelper;
 use BiffBangPow\SSMonitor\Server\Helper\EncryptionHelper;
 use BiffBangPow\SSMonitor\Server\Model\Client;
+use SilverStripe\Core\Config\Configurable;
+use SilverStripe\Core\Extensible;
 use SilverStripe\ORM\FieldType\DBDatetime;
 use Symbiote\QueuedJobs\Services\AbstractQueuedJob;
 use Symbiote\QueuedJobs\Services\QueuedJob;
+use Symbiote\QueuedJobs\Services\QueuedJobService;
+use SilverStripe\Core\Injector\Injector;
+use Psr\Log\LoggerInterface;
+
 
 class PollClientsTask extends AbstractQueuedJob
 {
+    use Configurable;
+    use Extensible;
+
+    /**
+     * @config
+     * @var int
+     */
+    private static $requeue_delay = 180;
 
     public function __construct()
     {
@@ -41,7 +55,6 @@ class PollClientsTask extends AbstractQueuedJob
     /**
      * @param array $res
      * @return string
-     * @todo - Write this code - iterate the array and update the client records, checking for successful responses and valid response data, correct uuid, etc.
      */
     private function updateClients($res)
     {
@@ -99,6 +112,7 @@ class PollClientsTask extends AbstractQueuedJob
                 'ClientData' => $data
             ]);
             $client->write();
+            $this->extend('OnAfterClientUpdate', $client);
             return;
 
         } else {
@@ -122,13 +136,33 @@ class PollClientsTask extends AbstractQueuedJob
             $client->ErrorMessage = $message;
             $client->write();
             $this->addMessage('Client: ' . $clientID . ' - ' . $message);
+            $this->extend('OnAfterClientFail', $clientID);
         } else {
             $this->addMessage('Cannot find client with ID ' . $clientID);
         }
     }
 
 
-    /**
-     * @todo Add requeue / after run functions
-     */
+    public function afterComplete()
+    {
+        $requeue_delay = $this->config()->get('requeue_delay');
+        Injector::inst()->get(LoggerInterface::class)->info("Client job finished.  Requeuing in " . $requeue_delay . " seconds");
+
+        $newJob = new PollClientsTask();
+        if ($requeue_delay > 0) {
+            singleton(QueuedJobService::class)
+                ->queueJob(
+                    $newJob,
+                    date(
+                        'Y-m-d H:i:s',
+                        strtotime('+' . $requeue_delay . ' seconds')
+                    )
+                );
+        } else {
+            singleton(QueuedJobService::class)->queueJob($newJob);
+        }
+
+        parent::afterComplete();
+    }
+
 }

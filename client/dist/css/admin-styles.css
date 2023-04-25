@@ -1,4 +1,3 @@
-@charset "UTF-8";
 .bbp-monitoring_alert-box {
   max-width: 800px;
   background: rgb(248, 215, 218);
@@ -36,11 +35,43 @@
   background-color: rgb(255, 193, 7);
 }
 
-.bbp-monitoring_status-warning.⚠ {
+.bbp-monitoring_status-warning {
   display: inline-block;
   font-size: 25px;
   font-weight: 700;
   color: rgb(255, 193, 7);
   padding-left: 0.5rem;
+}
+
+.bbp-monitor-section details {
+  background: aliceblue;
+}
+.bbp-monitor-section details summary {
+  background: #d7ecff;
+  padding: 1rem;
+}
+.bbp-monitor-section details summary h2 {
+  display: inline-block;
+  margin: 0;
+}
+.bbp-monitor-section details > div {
+  padding: 1rem;
+}
+
+.bbp-monitoring_client_warnings {
+  background: #eee;
+  padding: 1rem;
+}
+
+.bbp-monitor-results {
+  width: 95%;
+  max-width: 700px;
+  margin-top: 1rem;
+}
+.bbp-monitor-results td {
+  padding: 0.5rem 1rem 0.5rem 0;
+}
+.bbp-monitor-results thead {
+  border-bottom: solid 1px #d7ecff;
 }
 /*# sourceMappingURL=../../dist/css/maps/admin-styles.css.map */

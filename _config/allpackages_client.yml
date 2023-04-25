@@ -1,0 +1,8 @@
+---
+Name: bbp-monitoring-allpackages
+---
+
+BiffBangPow\SSMonitor\Server\Client\AllPackages:
+  data_config:
+    warnings:
+      dev_packages: true

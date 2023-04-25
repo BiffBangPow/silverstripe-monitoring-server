@@ -12,6 +12,7 @@ use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use League\Flysystem\Util;
 use SilverStripe\Core\Environment;
+use SilverStripe\Core\Extensible;
 use SilverStripe\Core\Injector\Injector;
 use Psr\Log\LoggerInterface;
 use function GuzzleHttp\Promise\settle;
@@ -115,7 +116,10 @@ class CommsHelper
      */
     private function getClientList()
     {
-        return Client::get()->filter(['active' => true]);
+        return Client::get()
+            ->filter(['active' => true])
+            ->sort('LastFetch')
+            ;
     }
 
 }

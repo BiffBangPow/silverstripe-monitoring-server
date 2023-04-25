@@ -4,6 +4,7 @@ namespace BiffBangPow\SSMonitor\Server\Client;
 
 use BiffBangPow\SSMonitor\Server\Helper\ReportingHelper;
 use SilverStripe\Core\Config\Configurable;
+use SilverStripe\Core\Extensible;
 use SilverStripe\Core\Injector\Injector;
 use SilverStripe\ORM\ArrayList;
 use SilverStripe\View\ArrayData;
@@ -15,6 +16,7 @@ class SystemInfo implements MonitoringClientInterface
 {
     use Configurable;
     use ClientCommon;
+    use Extensible;
 
     /**
      * @var string
@@ -43,10 +45,6 @@ class SystemInfo implements MonitoringClientInterface
      */
     private $clientData = [];
 
-    /**
-     * @var string
-     */
-    private $reportHTML = null;
 
 
     /**
@@ -60,7 +58,9 @@ class SystemInfo implements MonitoringClientInterface
         $this->clientData = $data;
         $this->checkMemoryLimit();
         $this->checkPHPVersion();
-        return (count($this->warnings) > 0) ? $this->warnings : false;
+        $allWarnings = $this->warnings;
+        $this->extend('updateWarnings', $allWarnings, $data);
+        return (count($allWarnings) > 0) ? $allWarnings : false;
     }
 
     /**
@@ -70,7 +70,7 @@ class SystemInfo implements MonitoringClientInterface
      */
     public function getReport($data)
     {
-        Injector::inst()->get(LoggerInterface::class)->info(print_r($data, true));
+        //Injector::inst()->get(LoggerInterface::class)->info(print_r($data, true));
         $this->clientData = $data;
         return $this->generateReportsHTML();
     }
