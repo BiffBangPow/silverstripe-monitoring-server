@@ -37,6 +37,7 @@ use SilverStripe\View\SSViewer;
  * @property bool $HasWarnings
  * @property bool $Active
  * @property string $ErrorMessage
+ * @property bool $Notified
  */
 class Client extends DataObject
 {
@@ -54,7 +55,8 @@ class Client extends DataObject
         'FetchError' => 'Boolean',
         'HasWarnings' => 'Boolean',
         'Active' => 'Boolean',
-        'ErrorMessage' => 'Text'
+        'ErrorMessage' => 'Text',
+        'Notified' => 'Boolean'
     ];
 
     private static $summary_fields = [
@@ -114,7 +116,8 @@ class Client extends DataObject
             'FetchError',
             'UUID',
             'ErrorMessage',
-            'HasWarnings'
+            'HasWarnings',
+            'Notified'
         ]);
 
         $session = Controller::curr()->getRequest()->getSession();
@@ -176,6 +179,8 @@ EOT;
         $warnings = [];
         $reports = '';
 
+        $res = $this->getConnectionReport();
+
         if ($this->ClientData) {
             $helper = new ClientHelper($this);
             $encHelper = new EncryptionHelper($helper->getEncryptionSecret(), $helper->getEncryptionSalt());
@@ -200,11 +205,11 @@ EOT;
                     }
                 }
             }
+
+            $res .= $this->getWarningsMarkup($warnings);
+            $res .= $reports;
         }
 
-        $res = $this->getConnectionReport();
-        $res .= $this->getWarningsMarkup($warnings);
-        $res .= $reports;
 
         return $res;
     }
@@ -264,6 +269,9 @@ EOT;
      */
     private function updateWarningStatus()
     {
+        if (!$this->ClientData) {
+            return;
+        }
         $helper = new ClientHelper($this);
         $encHelper = new EncryptionHelper($helper->getEncryptionSecret(), $helper->getEncryptionSalt());
         $clientData = $encHelper->decrypt($this->ClientData);

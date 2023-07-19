@@ -7,5 +7,6 @@ BiffBangPow\SSMonitor\Server\Client\CorePackages:
     warnings:
       dev_packages: true
       min_versions:
-        silverstripe/cms: 4.12
-        silverstripe/framework: 4.12.3
+        silverstripe/cms: 5.0 | 4.13
+        silverstripe/framework: 5.0 | 4.12
+        dorsetdigital/silverstripe-enhanced-requirements: 1.2

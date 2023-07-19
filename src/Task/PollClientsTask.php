@@ -6,14 +6,14 @@ use BiffBangPow\SSMonitor\Server\Helper\ClientHelper;
 use BiffBangPow\SSMonitor\Server\Helper\CommsHelper;
 use BiffBangPow\SSMonitor\Server\Helper\EncryptionHelper;
 use BiffBangPow\SSMonitor\Server\Model\Client;
+use Psr\Log\LoggerInterface;
 use SilverStripe\Core\Config\Configurable;
+use SilverStripe\Core\Environment;
 use SilverStripe\Core\Extensible;
+use SilverStripe\Core\Injector\Injector;
 use SilverStripe\ORM\FieldType\DBDatetime;
 use Symbiote\QueuedJobs\Services\AbstractQueuedJob;
-use Symbiote\QueuedJobs\Services\QueuedJob;
 use Symbiote\QueuedJobs\Services\QueuedJobService;
-use SilverStripe\Core\Injector\Injector;
-use Psr\Log\LoggerInterface;
 
 
 class PollClientsTask extends AbstractQueuedJob
@@ -109,7 +109,8 @@ class PollClientsTask extends AbstractQueuedJob
                 'LastFetch' => DBDatetime::now()->format('y-MM-dd HH:mm:ss'),
                 'ErrorMessage' => $message,
                 'FetchError' => false,
-                'ClientData' => $data
+                'ClientData' => $data,
+                'Notified' => false
             ]);
             $client->write();
             $this->extend('OnAfterClientUpdate', $client);
@@ -135,13 +136,34 @@ class PollClientsTask extends AbstractQueuedJob
             $client->FetchError = true;
             $client->ErrorMessage = $message;
             $client->write();
-            $this->addMessage('Client: ' . $clientID . ' - ' . $message);
+            $clientMessage = 'Client: ' . $clientID . ' (' . $client->Title . ') ' . ' : ' . $message;
+            $this->addMessage($clientMessage);
+            $this->notifySlack($client, $clientMessage);
             $this->extend('OnAfterClientFail', $clientID);
         } else {
             $this->addMessage('Cannot find client with ID ' . $clientID);
         }
     }
 
+    /**
+     * @param Client $client
+     * @param $message
+     * @return void
+     * @throws \Psr\Container\NotFoundExceptionInterface
+     */
+    private function notifySlack($client, $message = null)
+    {
+        $webhook = Environment::getEnv('SLACK_WEBHOOK');
+        $channel = Environment::getEnv('SLACK_CHANNEL');
+        if ($channel && $webhook && $client->Notified == 0) {
+            Injector::inst()->get(LoggerInterface::class . '.SlackLogger')
+                ->error($message);
+            $client->update([
+                'Notified' => true
+            ]);
+            $client->write();
+        }
+    }
 
     public function afterComplete()
     {

@@ -1,0 +1,28 @@
+---
+Name: montoro-logging
+Only:
+  envvarset:
+    - 'SLACK_WEBHOOK'
+    - 'SLACK_CHANNEL'
+---
+
+SilverStripe\Core\Injector\Injector:
+  Psr\Log\LoggerInterface.SlackLogger:
+    class: Monolog\Logger
+    constructor:
+      - "Montoro"
+    calls:
+      SlackLogHandler: [ pushHandler, [ "%$SlackLogHandler" ] ]
+  SlackLogHandler:
+    class: Monolog\Handler\SlackWebhookHandler
+    constructor:
+      - '`SLACK_WEBHOOK`'
+      - '`SLACK_CHANNEL`'
+      - 'Reporting bot'
+      - false
+      - ''
+      - false
+      - false
+      - 'info'
+
+---

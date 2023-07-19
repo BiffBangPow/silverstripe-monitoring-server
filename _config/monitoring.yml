@@ -5,3 +5,20 @@ Name: bbp-monitor-server
 SilverStripe\Admin\LeftAndMain:
   extra_requirements_css:
     - biffbangpow/silverstripe-monitoring-server:client/dist/css/admin-styles.css
+
+
+SilverStripe\Core\Injector\Injector:
+  Symbiote\QueuedJobs\Services\QueuedJobService:
+    properties:
+      defaultJobs:
+        PollClientsJob:
+          type: 'BiffBangPow\SSMonitor\Server\Task\PollClientsTask'
+          filter:
+            JobTitle: 'BBP Monitoring - Collect data'
+          construct:
+            repeat: 300
+            title: 'BBP Monitoring - Collect data'
+          startDateFormat: 'Y-m-d H:i:s'
+          startTimeString: '+5 minutes'
+          recreate: 1
+          email: '`DEFAULT_JOB_NOTIFY_EMAIL`'

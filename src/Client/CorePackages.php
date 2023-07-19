@@ -101,7 +101,25 @@ class CorePackages implements MonitoringClientInterface
             foreach ($this->clientData as $package => $version) {
                 if (isset($config['warnings']['min_versions'][$package])) {
                     $threshold = $config['warnings']['min_versions'][$package];
-                    if (ReportingHelper::isVersionLess($version, $threshold)) {
+                    $thresholdMatch = 0;
+
+                    if (stristr($threshold, "|")) {
+                        //We need to deal with the major versions
+                        $thresholdVersions = explode("|", $threshold);
+
+                        //Work out which major version we need to check against
+                        foreach ($thresholdVersions as $thresholdVersion) {
+                            if (ReportingHelper::getMajorVersion($thresholdVersion) == ReportingHelper::getMajorVersion($version)) {
+                                $thresholdMatch = $thresholdVersion;
+                                continue;
+                            }
+                        }
+
+                    } else {
+                        //We have just a straight comparison
+                        $thresholdMatch = $threshold;
+                    }
+                    if (ReportingHelper::isVersionLess($version, $thresholdMatch)) {
                         $this->warnings[] = _t(
                             __CLASS__ . '.corepackagewarning',
                             '{package} is below the required version. Required: {required}.  Actual: {actual}',

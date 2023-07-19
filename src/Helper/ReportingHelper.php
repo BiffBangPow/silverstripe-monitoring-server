@@ -48,6 +48,22 @@ class ReportingHelper
         return false;
     }
 
+    /**
+     * Extract the major version number for a given version string
+     * @param $versionString
+     * @return int|mixed|string|null
+     */
+    public static function getMajorVersion($versionString)
+    {
+        if (stristr($versionString, ".")) {
+            $versionParts = explode(".", $versionString);
+            return array_shift($versionParts);
+        }
+        else {
+            return (int)$versionString;
+        }
+    }
+
 
     /**
      * Convert a memory string to bytes
