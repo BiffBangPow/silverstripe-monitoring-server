@@ -107,7 +107,7 @@ class PollClientsTask extends AbstractQueuedJob
 
             $client->update([
                 'LastFetch' => DBDatetime::now()->format('y-MM-dd HH:mm:ss'),
-                'ErrorMessage' => $message,
+                'ErrorMessage' => '',
                 'FetchError' => false,
                 'ClientData' => $data,
                 'Notified' => false
@@ -129,7 +129,7 @@ class PollClientsTask extends AbstractQueuedJob
      * @return void
      * @throws \SilverStripe\ORM\ValidationException
      */
-    private function failClient($clientID, $message)
+    private function failClient(string $clientID, $message)
     {
         $client = Client::getByUUID($clientID);
         if ($client) {
