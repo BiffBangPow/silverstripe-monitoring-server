@@ -6,5 +6,5 @@ BiffBangPow\SSMonitor\Server\Client\SSConfiguration:
   data_config:
     warnings:
       required_environment: live
-      required_default_admin: 0
+      required_default_admin: false
 
