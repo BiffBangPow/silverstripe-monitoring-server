@@ -11,6 +11,7 @@ use GuzzleHttp\Promise\Utils;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use League\Flysystem\Util;
+use SilverStripe\Core\Config\Configurable;
 use SilverStripe\Core\Environment;
 use SilverStripe\Core\Extensible;
 use SilverStripe\Core\Injector\Injector;
@@ -21,15 +22,19 @@ use function GuzzleHttp\Promise\unwrap;
 
 class CommsHelper
 {
+    use Configurable;
 
     private $guzzleClient;
 
     private $requests = [];
 
+    private static $user_agent = 'Silverstripe monitoring system';
+
 
     public function __construct()
     {
         $this->guzzleClient = new \GuzzleHttp\Client(['timeout' => 5]);
+        $this->guzzleClient->setUserAgent($this->config()->get('user_agent'));
     }
 
 
