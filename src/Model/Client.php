@@ -181,39 +181,50 @@ EOT;
 
         $res = $this->getConnectionReport();
 
+        if ($this->getClientDataArray()) {
+            $clientDataArray = $this->getClientDataArray();
+
+            //Find all the classes which implement our client interface and see if the data array contains something for them
+            $clientClasses = ClassInfo::implementorsOf(MonitoringClientInterface::class);
+            foreach ($clientClasses as $fqcn) {
+
+                $ref = new \ReflectionClass($fqcn);
+                $monitorClass = $ref->newInstance();
+                $monitorName = $monitorClass->getClientName();
+
+                if (isset($clientDataArray[$monitorName])) {
+                    $reports .= $monitorClass->getReport($clientDataArray[$monitorName]);
+                    $monitorWarnings = $monitorClass->getWarnings($clientDataArray[$monitorName]);
+                    if ($monitorWarnings) {
+                        $warnings = array_merge($warnings, $monitorWarnings);
+                    }
+                }
+            }
+        }
+
+        $res .= $this->getWarningsMarkup($warnings);
+        $res .= $reports;
+
+        return $res;
+    }
+
+    /**
+     * Get the client data in an array
+     * @return false|array
+     */
+    function getClientDataArray()
+    {
         if ($this->ClientData) {
             $helper = new ClientHelper($this);
             $encHelper = new EncryptionHelper($helper->getEncryptionSecret(), $helper->getEncryptionSalt());
             $clientData = $encHelper->decrypt($this->ClientData);
             if ($clientData) {
                 $clientDataArray = unserialize($clientData);
-
-                //Find all the classes which implement our client interface and see if the data array contains something for them
-                $clientClasses = ClassInfo::implementorsOf(MonitoringClientInterface::class);
-                foreach ($clientClasses as $fqcn) {
-
-                    $ref = new \ReflectionClass($fqcn);
-                    $monitorClass = $ref->newInstance();
-                    $monitorName = $monitorClass->getClientName();
-
-                    if (isset($clientDataArray[$monitorName])) {
-                        $reports .= $monitorClass->getReport($clientDataArray[$monitorName]);
-                        $monitorWarnings = $monitorClass->getWarnings($clientDataArray[$monitorName]);
-                        if ($monitorWarnings) {
-                            $warnings = array_merge($warnings, $monitorWarnings);
-                        }
-                    }
-                }
+                return $clientDataArray;
             }
-
-            $res .= $this->getWarningsMarkup($warnings);
-            $res .= $reports;
         }
-
-
-        return $res;
+        return false;
     }
-
 
     /**
      * Generate some markup for the warnings
