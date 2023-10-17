@@ -24,7 +24,8 @@
         "symbiote/silverstripe-queuedjobs": "^4 | ^5",
         "guzzlehttp/guzzle": "^7",
         "guzzlehttp/promises": "^1",
-        "ramsey/uuid": "^4"
+        "ramsey/uuid": "^4",
+        "unclecheese/display-logic": "^2 | ^3"
     },
     "license": "BSD-3-Clause",
     "autoload": {

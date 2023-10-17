@@ -10,3 +10,10 @@ BiffBangPow\SSMonitor\Server\Client\CorePackages:
         silverstripe/cms: 5.0 | 4.13
         silverstripe/framework: 5.0 | 4.12
         dorsetdigital/silverstripe-enhanced-requirements: 1.2
+        biffbangpow/silverstripe-monitoring-client: 1
+
+BiffBangPow\SSMonitor\Server\Model\Client:
+  extensions:
+    - BiffBangPow\SSMonitor\Server\Extension\CorePackagesClientExtension
+
+

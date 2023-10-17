@@ -10,6 +10,7 @@ use Ramsey\Uuid\Uuid;
 use SilverStripe\Control\Controller;
 use SilverStripe\Core\ClassInfo;
 use SilverStripe\Core\Environment;
+use SilverStripe\Forms\CheckboxField;
 use SilverStripe\View\ArrayData;
 use SilverStripe\Forms\HeaderField;
 use SilverStripe\Forms\LiteralField;
@@ -117,7 +118,7 @@ class Client extends DataObject
             'UUID',
             'ErrorMessage',
             'HasWarnings',
-            'Notified'
+            'Notified',
         ]);
 
         $session = Controller::curr()->getRequest()->getSession();
