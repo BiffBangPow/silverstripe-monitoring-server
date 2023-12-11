@@ -181,8 +181,8 @@ EOT;
 
         $res = $this->getConnectionReport();
 
-        if ($this->getClientDataArray()) {
-            $clientDataArray = $this->getClientDataArray();
+        $clientDataArray = $this->getClientDataArray();
+        if ($clientDataArray) {
 
             //Find all the classes which implement our client interface and see if the data array contains something for them
             $clientClasses = ClassInfo::implementorsOf(MonitoringClientInterface::class);
