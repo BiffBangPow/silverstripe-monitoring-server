@@ -33,8 +33,8 @@ class CommsHelper
 
     public function __construct()
     {
-        $this->guzzleClient = new \GuzzleHttp\Client(['timeout' => 5]);
-        $this->guzzleClient->setUserAgent($this->config()->get('user_agent'));
+        $this->guzzleClient = new \GuzzleHttp\Client(['timeout' => 5, 'user_agent' => $this->config()->get('user_agent')]);
+        //$this->guzzleClient->setUserAgent($this->config()->get('user_agent'));
     }
 
 
